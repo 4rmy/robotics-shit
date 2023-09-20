@@ -1,28 +1,12 @@
 #include "main.h"
 
-
-/////
-// For instalattion, upgrading, documentations and tutorials, check out website!
-// https://ez-robotics.github.io/EZ-Template/
-/////
-
-
 const int DRIVE_SPEED = 110; // This is 110/127 (around 87% of max speed).  We don't suggest making this 127.
-                             // If this is 127 and the robot tries to heading correct, it's only correcting by
-                             // making one side slower.  When this is 87%, it's correcting by making one side
-                             // faster and one side slower, giving better heading correction.
 const int TURN_SPEED  = 90;
 const int SWING_SPEED = 90;
 
-
-
-///
-// Constants
-///
-
-// It's best practice to tune constants when the robot is empty and with heavier game objects, or with lifts up vs down.
-// If the objects are light or the cog doesn't change much, then there isn't a concern here.
-
+//
+// constants
+//
 void default_constants() {
   chassis.set_slew_min_power(80, 80);
   chassis.set_slew_distance(7, 7);
@@ -65,18 +49,10 @@ void modified_exit_condition() {
   chassis.set_exit_condition(chassis.drive_exit, 80, 50, 300, 150, 500, 500);
 }
 
-
-
-///
-// Drive Example
-///
+//
+// Autons
+//
 void drive_example() {
-  // The first parameter is target inches
-  // The second parameter is max speed the robot will drive at
-  // The third parameter is a boolean (true or false) for enabling/disabling a slew at the start of drive motions
-  // for slew, only enable it when the drive distance is greater then the slew distance + a few inches
-
-
   chassis.set_drive_pid(24, DRIVE_SPEED, true);
   chassis.wait_drive();
 
@@ -87,16 +63,7 @@ void drive_example() {
   chassis.wait_drive();
 }
 
-
-
-///
-// Turn Example
-///
 void turn_example() {
-  // The first parameter is target degrees
-  // The second parameter is max speed the robot will drive at
-
-
   chassis.set_turn_pid(90, TURN_SPEED);
   chassis.wait_drive();
 
@@ -107,11 +74,6 @@ void turn_example() {
   chassis.wait_drive();
 }
 
-
-
-///
-// Combining Turn + Drive
-///
 void drive_and_turn() {
   chassis.set_drive_pid(24, DRIVE_SPEED, true);
   chassis.wait_drive();
@@ -129,19 +91,10 @@ void drive_and_turn() {
   chassis.wait_drive();
 }
 
-
-
-///
-// Wait Until and Changing Max Speed
-///
 void wait_until_change_speed() {
-  // wait_until will wait until the robot gets to a desired position
-
-
-  // When the robot gets to 6 inches, the robot will travel the remaining distance at a max speed of 40
   chassis.set_drive_pid(24, DRIVE_SPEED, true);
   chassis.wait_until(6);
-  chassis.set_max_speed(40); // After driving 6 inches at DRIVE_SPEED, the robot will go the remaining distance at 40 speed
+  chassis.set_max_speed(40);
   chassis.wait_drive();
 
   chassis.set_turn_pid(45, TURN_SPEED);
@@ -153,24 +106,13 @@ void wait_until_change_speed() {
   chassis.set_turn_pid(0, TURN_SPEED);
   chassis.wait_drive();
 
-  // When the robot gets to -6 inches, the robot will travel the remaining distance at a max speed of 40
   chassis.set_drive_pid(-24, DRIVE_SPEED, true);
   chassis.wait_until(-6);
-  chassis.set_max_speed(40); // After driving 6 inches at DRIVE_SPEED, the robot will go the remaining distance at 40 speed
+  chassis.set_max_speed(40);
   chassis.wait_drive();
 }
 
-
-
-///
-// Swing Example
-///
 void swing_example() {
-  // The first parameter is ez::LEFT_SWING or ez::RIGHT_SWING
-  // The second parameter is target degrees
-  // The third parameter is speed of the moving side of the drive
-
-
   chassis.set_swing_pid(ez::LEFT_SWING, 45, SWING_SPEED);
   chassis.wait_drive();
 
@@ -181,11 +123,6 @@ void swing_example() {
   chassis.wait_drive();
 }
 
-
-
-///
-// Auto that tests everything
-///
 void combining_movements() {
   chassis.set_drive_pid(24, DRIVE_SPEED, true);
   chassis.wait_drive();
@@ -203,11 +140,6 @@ void combining_movements() {
   chassis.wait_drive();
 }
 
-
-
-///
-// Interference example
-///
 void tug (int attempts) {
   for (int i=0; i<attempts-1; i++) {
     // Attempt to drive backwards
@@ -228,8 +160,6 @@ void tug (int attempts) {
   }
 }
 
-// If there is no interference, robot will drive forward and turn 90 degrees. 
-// If interfered, robot will drive forward and then attempt to drive backwards. 
 void interfered_example() {
  chassis.set_drive_pid(24, DRIVE_SPEED, true);
  chassis.wait_drive();
@@ -242,9 +172,3 @@ void interfered_example() {
  chassis.set_turn_pid(90, TURN_SPEED);
  chassis.wait_drive();
 }
-
-
-
-// . . .
-// Make your own autonomous functions here!
-// . . .
