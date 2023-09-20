@@ -1,2 +1,3 @@
-# robotics shit
- Code for robot 2023-2034
+# 2023-2024 Robotics Code
+Dont steal this
+Not Coolio with hoolio
