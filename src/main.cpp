@@ -1,4 +1,6 @@
 #include "main.h"
+#include "pros/llemu.hpp"
+#include "pros/screen.hpp"
 
 Drive chassis (
   {2, 5}
@@ -50,6 +52,8 @@ void competition_initialize() {
 }
 
 void autonomous() {
+  pros::lcd::clear();
+
   chassis.reset_pid_targets();
   chassis.reset_gyro();
   chassis.reset_drive_sensor();
@@ -59,6 +63,8 @@ void autonomous() {
 }
 
 void opcontrol() {
+  pros::lcd::clear();
+
   chassis.set_drive_brake(MOTOR_BRAKE_COAST);
 
   while (true) {
