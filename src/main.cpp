@@ -12,11 +12,9 @@
 #include <iostream>
 #include <string>
 
-int stage = 0;
-
 Drive chassis (
-  {-1,-2,-3}
-  ,{4,5,6}
+  {4,5,6}
+  ,{1,2,3}
   ,13
   ,4.125
   ,200
@@ -79,117 +77,36 @@ void opcontrol() {
   pros::lcd::print(4, "  / /_   | |/ /_ / . \\ ");
   pros::lcd::print(5, " |____|  |_|____/_/ \\_\\");
   pros::Motor cata(-10);
-  pros::Motor intake(-20);
+  pros::Motor intake(-19);
   intake.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-  pros::Rotation rot(11);
-  pros::ADIDigitalOut wings('h');
-  pros::ADIDigitalOut atwp('a');
-  wings.set_value(false);
-  atwp.set_value(false);
-  rot.reset_position();
-
-
-  float speed = 0.7;
-  const int maxspeed = 12000;
-  
-  const int finalposition = 36800;
-  const int midposition = 33500;
-  const int autonposition = 19500;
-
-  const float kp = 0.7;
-  const float ki = 0.03;
-  float error = 0;
-  float intergral = 0;
+  pros::ADIDigitalOut wings('a');
+  pros::ADIDigitalOut ramp('b');
+  pros::ADIDigitalOut atwp('c');
 
   bool wingstate = false;
+  bool rampstate = false;
   bool awpstate = false;
+
+  wings.set_value(wingstate);
+  ramp.set_value(rampstate);
+  atwp.set_value(awpstate);
 
   chassis.set_drive_brake(MOTOR_BRAKE_COAST);
 
   while (true) {
-    controller.set_text(0, 0, "                        ");
-    controller.set_text(0, 0, "Speed(%) : " + std::to_string((int) (speed*100)));
     //chassis.tank(); // Tank control
     chassis.arcade_standard(ez::SPLIT); // Standard split arcade
     // chassis.arcade_standard(ez::SINGLE); // Standard single arcade
     // chassis.arcade_flipped(ez::SPLIT); // Flipped split arcade
     // chassis.arcade_flipped(ez::SINGLE); // Flipped single arcade
 
-    // user code here
-    if (stage == 0) { // cata is loadable
-      if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1)) { // fire
-        rot.reset_position();
-        stage = 1;
-        error = 0;
-        intergral = 0;
-      } else if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) { // reload to intake blocker
-        rot.reset_position();
-        stage = 2;
-        error = 0;
-        intergral = 0;
-      }
-    } else if (stage == 4) {
-      if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) { // bring back to load angle
-        stage = 1;
-        intergral = 0;
-      }
-    }
-    
-    if (stage == 1) { // bring to fire angle
-      if (rot.get_position() < finalposition) {
-        error = abs(rot.get_position() - finalposition);
-        float proportional = error;
-        if (finalposition-rot.get_position() <= 0.5*(finalposition)){
-          intergral += error;
-        }
-        cata.move_voltage(proportional*kp + intergral*ki);
-      } else {
-        cata.move_voltage(0);
-        stage = 0;
-      }
-    } else if (stage == 2) { // bring to blocker angle
-      if (rot.get_position() < midposition) {
-        error = abs(rot.get_position() - midposition);
-        float proportional = error;
-        if (midposition-rot.get_position() <= 0.5*(midposition)){
-          intergral += error;
-        }
-        cata.move_voltage(proportional*kp + intergral*ki);
-      } else {
-        cata.move_voltage(0);
-        stage = 4;
-      }
-    } else if (stage == 5) {
-      if (rot.get_position() < midposition) {
-      error = abs(rot.get_position() - midposition);
-      float proportional = error;
-      if (midposition-rot.get_position() <= 0.5*(midposition)){
-        intergral += error;
-      }
-      cata.move_voltage(proportional*kp + intergral*ki);
+    if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+      cata = 127;
     } else {
-      cata.move_voltage(0);
-      stage = 0;
-    }
+      cata = 0;
     }
 
-    if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2))
-    {
-      cata.move_voltage(12000*speed);
-    } else {
-      if (stage != 1 and stage != 2 and stage != 5) {
-        cata.move_voltage(0);
-      }
-    }
-
-    if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
-      speed += 0.01;
-    }
-    if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) {
-      speed -= 0.01;
-    }
-
-    if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1) and (stage == 0 or stage == 4)) {
+    if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
       intake = 95;
     } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
       intake = -95;

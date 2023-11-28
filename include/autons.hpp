@@ -3,7 +3,6 @@
 #include "EZ-Template/drive/drive.hpp"
 
 extern Drive chassis;
-extern int stage;
 
 void left_side_winpoint();
 void right_side_winpoint();
