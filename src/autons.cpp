@@ -1,8 +1,5 @@
 #include "autons.hpp"
-#include "main.h"
 #include "pros/adi.hpp"
-#include "pros/misc.h"
-#include "pros/misc.hpp"
 #include "pros/motors.h"
 #include "pros/motors.hpp"
 #include "pros/rtos.hpp"
