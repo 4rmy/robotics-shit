@@ -6,16 +6,13 @@
 #include "pros/misc.h"
 #include "pros/motors.h"
 #include "pros/motors.hpp"
-#include "pros/rotation.hpp"
 #include "pros/rtos.hpp"
-#include "pros/screen.hpp"
-#include <iostream>
 #include <string>
 
 Drive chassis (
-  {4,5,6}
+  {-11,-12,-13}
   ,{1,2,3}
-  ,13
+  ,21
   ,4.125
   ,200
 
@@ -69,6 +66,23 @@ void autonomous() {
 void opcontrol() {
   pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
+  pros::Motor kicker(-10);
+  pros::Motor intake(-19);
+  intake.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+  kicker.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+
+  bool wingstate = false;
+  bool rampstate = false;
+  bool fourbarstate = false;
+  pros::ADIDigitalOut wings('a');
+  pros::ADIDigitalOut ramp('b');
+  pros::ADIDigitalOut fourbar('c');
+  wings.set_value(wingstate);
+  ramp.set_value(rampstate);
+  fourbar.set_value(fourbarstate);
+
+  chassis.set_drive_brake(MOTOR_BRAKE_COAST);
+
   pros::lcd::clear();
   pros::lcd::print(0, "  ___  _  _ ___ __   __");
   pros::lcd::print(1, " |__ \\| || |__ \\\\ \\ / /");
@@ -76,22 +90,6 @@ void opcontrol() {
   pros::lcd::print(3, "   / /|__   _/ /  > <  ");
   pros::lcd::print(4, "  / /_   | |/ /_ / . \\ ");
   pros::lcd::print(5, " |____|  |_|____/_/ \\_\\");
-  pros::Motor cata(-10);
-  pros::Motor intake(-19);
-  intake.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-  pros::ADIDigitalOut wings('a');
-  pros::ADIDigitalOut ramp('b');
-  pros::ADIDigitalOut atwp('c');
-
-  bool wingstate = false;
-  bool rampstate = false;
-  bool awpstate = false;
-
-  wings.set_value(wingstate);
-  ramp.set_value(rampstate);
-  atwp.set_value(awpstate);
-
-  chassis.set_drive_brake(MOTOR_BRAKE_COAST);
 
   while (true) {
     //chassis.tank(); // Tank control
@@ -100,12 +98,14 @@ void opcontrol() {
     // chassis.arcade_flipped(ez::SPLIT); // Flipped split arcade
     // chassis.arcade_flipped(ez::SINGLE); // Flipped single arcade
 
+    // kicker control
     if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
-      cata = 127;
+      kicker = 127;
     } else {
-      cata = 0;
+      kicker = 0;
     }
 
+    // intake control
     if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
       intake = 95;
     } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
@@ -114,14 +114,16 @@ void opcontrol() {
       intake = 0;
     }
 
+    // extend wings
     if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
       wingstate = !wingstate;
       wings.set_value(wingstate);
     }
 
+    // raise four-bar
     if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) {
-      awpstate = !awpstate;
-      atwp.set_value(awpstate);
+      fourbarstate = !fourbarstate;
+      fourbar.set_value(fourbarstate);
     }
 
     // dont touch
