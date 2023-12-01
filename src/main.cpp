@@ -72,14 +72,17 @@ void opcontrol() {
   kicker.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 
   bool wingstate = false;
-  bool rampstate = false;
+  bool rampstate = true;
   bool fourbarstate = false;
+  bool bitchslapstate = false;
   pros::ADIDigitalOut wings('a');
   pros::ADIDigitalOut ramp('b');
-  pros::ADIDigitalOut fourbar('c');
+  pros::ADIDigitalOut fourbar('H');
+  pros::ADIDigitalOut bitchslap('G');
   wings.set_value(wingstate);
   ramp.set_value(rampstate);
   fourbar.set_value(fourbarstate);
+  bitchslap.set_value(bitchslapstate);
 
   chassis.set_drive_brake(MOTOR_BRAKE_COAST);
 
@@ -94,6 +97,7 @@ void opcontrol() {
   while (true) {
     //chassis.tank(); // Tank control
     chassis.arcade_standard(ez::SPLIT); // Standard split arcade
+    chassis.set_joystick_threshold(20);
     // chassis.arcade_standard(ez::SINGLE); // Standard single arcade
     // chassis.arcade_flipped(ez::SPLIT); // Flipped split arcade
     // chassis.arcade_flipped(ez::SINGLE); // Flipped single arcade
@@ -124,6 +128,12 @@ void opcontrol() {
     if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) {
       fourbarstate = !fourbarstate;
       fourbar.set_value(fourbarstate);
+    }
+    
+    // control bitslap for hong
+    if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
+      bitchslapstate = !bitchslapstate;
+      bitchslap.set_value(bitchslapstate);
     }
 
     // dont touch
