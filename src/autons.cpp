@@ -1,17 +1,20 @@
 #include "autons.hpp"
+#include "EZ-Template/util.hpp"
 #include "pros/adi.hpp"
 #include "pros/motors.h"
 #include "pros/motors.hpp"
-#include "pros/rtos.hpp"
 
 const int DRIVE_SPEED = 110; // This is 110/127 (around 87% of max speed).  We don't suggest making this 127.
 const int TURN_SPEED  = 90;
 const int SWING_SPEED = 90;
 
-pros::Motor intake(-20);
+pros::Motor intake(-19);
 pros::Motor cata(-10);
-pros::ADIDigitalOut bitchslap('a');
-pros::ADIDigitalOut wings('h');
+
+pros::ADIDigitalOut bitchslap('G');
+pros::ADIDigitalOut wings('A');
+pros::ADIDigitalOut fourbar('H');
+pros::ADIDigitalOut ramp('B');
 
 //
 // constants
@@ -179,7 +182,7 @@ void right_side_winpoint() {
   chassis.set_drive_pid(-4, DRIVE_SPEED);
   chassis.wait_drive();
 
-  chassis.set_turn_pid(-45, TURN_SPEED);
+  chassis.set_turn_pid(45, TURN_SPEED);
   chassis.wait_drive();
 
   bitchslap.set_value(true);
@@ -187,79 +190,33 @@ void right_side_winpoint() {
   chassis.set_drive_pid(-8, DRIVE_SPEED);
   chassis.wait_drive();
 
-  chassis.set_turn_pid(-65, TURN_SPEED);
+  chassis.set_turn_pid(65, TURN_SPEED);
   chassis.wait_drive();
 }
 
-void skills() {
-  intake.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-
-  int time = pros::millis();
-  while (pros::millis() < time + 20000) {
-    intake = -127;
-  }
-  intake = 0;
-
-  chassis.set_turn_pid(185, TURN_SPEED);
+void left_elim() {
+  chassis.set_drive_pid(-11, DRIVE_SPEED/2);
   chassis.wait_drive();
 
-  chassis.set_drive_pid(-4, DRIVE_SPEED);
+  chassis.set_turn_pid(45, TURN_SPEED);
   chassis.wait_drive();
 
-  chassis.set_turn_pid(180, TURN_SPEED);
-  chassis.wait_drive();
-
-  chassis.set_drive_pid(-36, DRIVE_SPEED);
-  chassis.wait_drive();
-
-  chassis.set_drive_pid(36, DRIVE_SPEED);
-  chassis.wait_drive();
-
-  chassis.set_turn_pid(0, TURN_SPEED);
-  chassis.wait_drive();
-
-  chassis.set_drive_pid(-4, DRIVE_SPEED);
-  chassis.wait_drive();
-
-  time = pros::millis();
-  while (pros::millis() < time + 20000) {
-    intake = -127;
-  }
-  intake = 0;
-
-  chassis.set_turn_pid(185, TURN_SPEED);
-  chassis.wait_drive();
-
-  chassis.set_drive_pid(-4, DRIVE_SPEED);
-  chassis.wait_drive();
-
-  chassis.set_turn_pid(180, TURN_SPEED);
-  chassis.wait_drive();
-
-  chassis.set_drive_pid(-36, DRIVE_SPEED);
-  chassis.wait_drive();
-
-  chassis.set_turn_pid(135, TURN_SPEED);
-  chassis.wait_drive();
-
-  chassis.set_drive_pid(-6, DRIVE_SPEED);
-  chassis.wait_drive();
-
-  chassis.set_turn_pid(90, TURN_SPEED);
-  chassis.wait_drive();
-
-  chassis.set_drive_pid(-6, 127);
-  chassis.wait_drive();
-
-  chassis.set_drive_pid(4, DRIVE_SPEED);
-  chassis.wait_drive();
-
-  chassis.set_drive_pid(-6, 127);
-  chassis.wait_drive();
-
-  chassis.set_drive_pid(4, DRIVE_SPEED);
+  chassis.set_drive_pid(-8, 127);
   chassis.wait_drive();
 }
+
+void right_elim() {
+  chassis.set_drive_pid(-11, DRIVE_SPEED/2);
+  chassis.wait_drive();
+
+  chassis.set_turn_pid(-45, TURN_SPEED);
+  chassis.wait_drive();
+
+  chassis.set_drive_pid(-8, 127);
+  chassis.wait_drive();
+}
+
+void skills() { fourbar.set_value(true); ramp.set_value(true); while (true) { cata = 127; pros::delay(ez::util::DELAY_TIME);} }
 
 void blank() {}
 

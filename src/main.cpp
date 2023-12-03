@@ -1,5 +1,7 @@
 #include "main.h"
 #include "EZ-Template/auton.hpp"
+#include "EZ-Template/sdcard.hpp"
+#include "EZ-Template/util.hpp"
 #include "autons.hpp"
 #include "pros/adi.hpp"
 #include "pros/llemu.hpp"
@@ -37,13 +39,16 @@ void initialize() {
     Auton("No Auton", blank),
     Auton("Left Side Win Point", left_side_winpoint),
     Auton("Right Side Win Point", right_side_winpoint),
+    Auton("Left Elim", left_elim),
+    Auton("Right Elim", right_elim),
     Auton("Skills Auton", skills),
   });
 
   // Initialize chassis and auton selector
   chassis.initialize();
-  ez::as::initialize();
 
+  pros::Controller controller(pros::E_CONTROLLER_MASTER);
+  ez::as::initialize();
 }
 
 void disabled() {
@@ -72,7 +77,7 @@ void opcontrol() {
   kicker.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 
   bool wingstate = false;
-  bool rampstate = true;
+  bool rampstate = false;
   bool fourbarstate = false;
   bool bitchslapstate = false;
   pros::ADIDigitalOut wings('a');
@@ -126,14 +131,22 @@ void opcontrol() {
 
     // raise four-bar
     if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) {
-      fourbarstate = !fourbarstate;
-      fourbar.set_value(fourbarstate);
+      if (!(fourbarstate && rampstate)) {
+        fourbarstate = !fourbarstate;
+        fourbar.set_value(fourbarstate);
+      }
     }
     
-    // control bitslap for hong
+    /* control bitslap for hang
     if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
       bitchslapstate = !bitchslapstate;
       bitchslap.set_value(bitchslapstate);
+    }*/
+
+    // toggle instake ramp
+    if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
+      rampstate = !rampstate;
+      ramp.set_value(rampstate);
     }
 
     // dont touch
