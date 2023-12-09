@@ -39,8 +39,8 @@ void initialize() {
     Auton("No Auton", blank),
     Auton("Left Side Win Point", left_side_winpoint),
     Auton("Right Side Win Point", right_side_winpoint),
-    Auton("Left Elim", left_elim),
-    Auton("Right Elim", right_elim),
+    Auton("Aggressive Left Elim", aggressive_left_elim),
+    Auton("Aggressive Right Elim", aggressive_right_elim),
     Auton("Skills Auton", skills),
   });
 

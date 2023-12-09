@@ -6,8 +6,8 @@ extern Drive chassis;
 
 void left_side_winpoint();
 void right_side_winpoint();
-void left_elim();
-void right_elim();
+void aggressive_left_elim();
+void aggressive_right_elim();
 void skills();
 void blank();
 
