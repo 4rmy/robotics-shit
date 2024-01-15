@@ -1,22 +1,16 @@
 #include "autons.hpp"
-#include "pros/adi.hpp"
 #include "pros/motors.hpp"
 
 const int DRIVE_SPEED = 110; // This is 110/127 (around 87% of max speed).  We don't suggest making this 127.
 const int TURN_SPEED  = 90;
 const int SWING_SPEED = 90;
 
-pros::Motor intake(-19);
-pros::Motor cata(-10);
-
-pros::ADIDigitalOut bitchslap('G');
-pros::ADIDigitalOut wings('A');
-pros::ADIDigitalOut fourbar('H');
-pros::ADIDigitalOut ramp('B');
+pros::Motor kicker(14);
 
 //
 // Autons
 //
+/*
 void left_side_winpoint() {
   intake = 127;
 
@@ -131,8 +125,6 @@ void right_side_winpoint() {
 
   chassis.set_drive_pid(-5, 127);
   chassis.wait_drive();
-
-  wings.set_value(true);
 
   chassis.set_drive_pid(17, 127);
   chassis.wait_drive();
@@ -266,189 +258,27 @@ void aggressive_right_elim() {
   chassis.set_drive_pid(2, 127);
   chassis.wait_drive();
 }
+*/
 
 void skills() {
-  chassis.set_exit_condition(chassis.drive_exit, 80, 50, 300, 150, 500, 500);
-
-  bool run = true;
-  int start = pros::millis();
-
-  intake = 127;
-
-  pros::delay(500);
-
-  if (run) {
-    fourbar.set_value(true);
-
-    pros::delay(250);
-
-    while (pros::millis() < start + 45000) { // 45 secs
-      cata = 127;
-
-      pros::delay(10);
-    }
-
-    cata = 0;
-    fourbar.set_value(false);
-  }
-
-  intake = -127;
-
-  chassis.set_turn_pid(-40, TURN_SPEED);
-  chassis.wait_drive();
-
-  chassis.set_drive_pid(24, DRIVE_SPEED);
-  chassis.wait_drive();
-
-  chassis.set_turn_pid(30, TURN_SPEED);
-  chassis.wait_drive();
-
-  chassis.set_drive_pid(6, DRIVE_SPEED);
-  chassis.wait_drive();
-
-  chassis.set_drive_pid(-12, DRIVE_SPEED);
-  chassis.wait_drive();
-
-  wings.set_value(true);
   
-  chassis.set_drive_pid(100, 127);
-  chassis.wait_until(40);
-  chassis.set_drive_pid(0, 0);
-  chassis.wait_drive();
+  pros::delay(35000);
 
-  chassis.set_drive_pid(-8, DRIVE_SPEED);
-  chassis.wait_drive();
-
-  chassis.set_drive_pid(12, 127);
-  chassis.wait_drive();
-
-  chassis.set_drive_pid(-12, DRIVE_SPEED);
-  chassis.wait_drive();
-
-  chassis.set_drive_pid(12, 127);
-  chassis.wait_drive();
-
-  chassis.set_drive_pid(-12, DRIVE_SPEED);
-  chassis.wait_drive();
-
-  chassis.set_drive_pid(12, 127);
-  chassis.wait_drive();
-
-  chassis.set_drive_pid(-12, DRIVE_SPEED);
-  chassis.wait_drive();
-
-  chassis.set_drive_pid(12, 127);
-  chassis.wait_drive();
-
-  chassis.set_drive_pid(-12, DRIVE_SPEED);
-  chassis.wait_drive();
+  chassis.set_tank(-127, -127);
+  pros::delay(5000);
+  chassis.set_tank(100, 100);
+  pros::delay(3000);
+  chassis.set_tank(0,0);
 }
 
+void back() {
+  chassis.set_tank(-127, -127);
+  pros::delay(10000);
+  chassis.set_tank(20,20);
+  pros::delay(3000);
+  chassis.set_tank(0,0);
+}
+
+// used for no auton if necessary
+//    (its a failsafe)
 void blank() {}
-
-/*
-  void drive_and_turn() {
-    chassis.set_drive_pid(24, DRIVE_SPEED, true);
-    chassis.wait_drive();
-
-    chassis.set_turn_pid(45, TURN_SPEED);
-    chassis.wait_drive();
-
-    chassis.set_turn_pid(-45, TURN_SPEED);
-    chassis.wait_drive();
-
-    chassis.set_turn_pid(0, TURN_SPEED);
-    chassis.wait_drive();
-
-    chassis.set_drive_pid(-24, DRIVE_SPEED, true);
-    chassis.wait_drive();
-  }
-
-  void wait_until_change_speed() {
-    chassis.set_drive_pid(24, DRIVE_SPEED, true);
-    chassis.wait_until(6);
-    chassis.set_max_speed(40);
-    chassis.wait_drive();
-
-    chassis.set_turn_pid(45, TURN_SPEED);
-    chassis.wait_drive();
-
-    chassis.set_turn_pid(-45, TURN_SPEED);
-    chassis.wait_drive();
-
-    chassis.set_turn_pid(0, TURN_SPEED);
-    chassis.wait_drive();
-
-    chassis.set_drive_pid(-24, DRIVE_SPEED, true);
-    chassis.wait_until(-6);
-    chassis.set_max_speed(40);
-    chassis.wait_drive();
-  }
-
-  void swing_example() {
-    chassis.set_swing_pid(ez::LEFT_SWING, 45, SWING_SPEED);
-    chassis.wait_drive();
-
-    chassis.set_drive_pid(24, DRIVE_SPEED, true);
-    chassis.wait_until(12);
-
-    chassis.set_swing_pid(ez::RIGHT_SWING, 0, SWING_SPEED);
-    chassis.wait_drive();
-  }
-
-  void combining_movements() {
-    chassis.set_drive_pid(24, DRIVE_SPEED, true);
-    chassis.wait_drive();
-
-    chassis.set_turn_pid(45, TURN_SPEED);
-    chassis.wait_drive();
-
-    chassis.set_swing_pid(ez::RIGHT_SWING, -45, TURN_SPEED);
-    chassis.wait_drive();
-
-    chassis.set_turn_pid(0, TURN_SPEED);
-    chassis.wait_drive();
-
-    chassis.set_drive_pid(-24, DRIVE_SPEED, true);
-    chassis.wait_drive();
-  }
-
-  void tug (int attempts) {
-    for (int i=0; i<attempts-1; i++) {
-      // Attempt to drive backwards
-      printf("i - %i", i);
-      chassis.set_drive_pid(-12, 127);
-      chassis.wait_drive();
-
-      // If failsafed...
-      if (chassis.interfered) {
-        chassis.reset_drive_sensor();
-        chassis.set_drive_pid(-2, 20);
-        pros::delay(1000);
-      }
-      // If robot successfully drove back, return
-      else {
-        return;
-      }
-    }
-  }
-
-  void interfered_example() {
-  chassis.set_drive_pid(24, DRIVE_SPEED, true);
-  chassis.wait_drive();
-
-  if (chassis.interfered) {
-    tug(3);
-    return;
-  }
-
-  chassis.set_turn_pid(90, TURN_SPEED);
-  chassis.wait_drive();
-  }
-*/
-
-/*
-1 min 30 secs
-90s
-90000 msec
-*/

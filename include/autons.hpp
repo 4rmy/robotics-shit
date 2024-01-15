@@ -3,12 +3,8 @@
 #include "EZ-Template/drive/drive.hpp"
 
 extern Drive chassis;
-
-void left_side_winpoint();
-void right_side_winpoint();
-void aggressive_left_elim();
-void aggressive_right_elim();
 void skills();
+void back();
 void blank();
 
 void default_constants();
