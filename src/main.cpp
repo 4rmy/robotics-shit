@@ -9,7 +9,11 @@
 #include "pros/misc.hpp"
 #include "pros/motors.h"
 #include "pros/motors.hpp"
+#include "pros/rtos.h"
 #include "pros/rtos.hpp"
+#include <cstdio>
+#include <iostream>
+#include <ostream>
 #include <string>
 
 // chassis
@@ -29,6 +33,18 @@ Drive chassis(
     64 / (float)36
 );
 
+bool running = true;
+
+void select_auton() {
+    pros::ADIDigitalIn limit('d');
+    while (running) {
+        if (limit.get_new_press()) {
+            ez::as::page_up();
+        }
+        pros::delay(ez::util::DELAY_TIME);
+    }
+}
+
 // set things up before the match
 void initialize() {
     pros::delay(500); // Stop the user from doing anything while legacy ports configure.
@@ -45,17 +61,23 @@ void initialize() {
 
     // Autonomous Selector using LLEMU
     ez::as::auton_selector.add_autons({
-        Auton("Back", back),
-        Auton("Skills Auton", skills),
-        Auton("No Auton", blank),
+        Auton("Close Qualifier Auton\n1. Gets triball out of the corner.\n2. Scores alliance triball.\n3. Grabs middle triball.\n4. Touches alliance pole.", close_qual),
+        Auton("Far Qualifier Auton\n1. Slaps alliance triball towards goal.\n2. Grabs furthest middle triball.\n3. Scores middle triballs.\n4. Grabs last middle triball.\n5. Scores held triball and alliance triball.\n6. Touch Bar.", far_qual),
+        Auton("Close Elimination Auton\nJust trust that it will do well.", close_elim),
+        Auton("Far Elimination Auton\nJust trust that it will do well.", far_elim),
+        Auton("Skills Auton\nOnly for skills.", skills),
+        Auton("Backwards Auton\nOnly Moves Backwards.", back),
+        Auton("No Auton\nIt literally stands still.", blank),
     });
 
     // Initialize chassis and auton selector
     chassis.initialize();
 
-    // used in auton selector
-    pros::Controller controller(pros::E_CONTROLLER_MASTER);
+    // auton selector
     ez::as::initialize();
+
+    // limit switch selector
+    pros::Task(select_auton, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "selector");
 }
 
 // not used
@@ -68,6 +90,7 @@ void competition_initialize() {}
 //  select autons
 //  init hardware for autons
 void autonomous() {
+    running = false;
     chassis.reset_pid_targets();
     chassis.reset_gyro();
     chassis.reset_drive_sensor();
@@ -78,6 +101,7 @@ void autonomous() {
 
 // bot for driver control
 void opcontrol() {
+    running = false;
     // cool art
     pros::lcd::clear();
     pros::lcd::print(0, "  ___  _  _ ___ __   __");
@@ -90,20 +114,36 @@ void opcontrol() {
     // controller
     pros::Controller controller(pros::E_CONTROLLER_MASTER);
     // kicker
-    pros::Motor kicker(14);
+    pros::Motor kicker(17);
     // intake
     pros::Motor intake(15);
 
-    // pto
-    pros::ADIDigitalOut pto('a');
-    bool pto_toggled = false;
-    pto.set_value(pto_toggled);
-
     // wings
-    pros::ADIDigitalOut wings('b');
+    pros::ADIDigitalOut wings('a');
     bool wings_toggled = false;
     wings.set_value(wings_toggled);
 
+    // pto
+    pros::ADIDigitalOut pto('b');
+    bool pto_toggled = true;
+    pto.set_value(pto_toggled);
+
+    // arm
+    pros::ADIDigitalOut arm('c');
+    bool arm_toggled = false;
+    arm.set_value(arm_toggled);
+
+    // hang lock
+    pros::ADIDigitalOut lock('e');
+    bool lock_toggled = false;
+    lock.set_value(lock_toggled);
+
+    //
+    //    MACRO FOR DRIVER SKILLS
+    //      "X" and "Up" to start Macro
+    //
+
+    // driver loop
     while (true) {
         //
         //    DRIVE CONTROL
@@ -144,21 +184,44 @@ void opcontrol() {
         }
 
         //
-        //    PTO CONTROLL
-        //      "A" to switch pto from kicker to hang and vice versa
+        //    WINGS CONTROLL
+        //      "A" to extend or retract wings
         //
         if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
+            wings_toggled = !wings_toggled;
+            wings.set_value(wings_toggled);
+        }
+
+        //
+        //    PTO CONTROLL
+        //      "Left" to switch pto from kicker to hang and vice versa
+        //
+        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) {
             pto_toggled = !pto_toggled;
             pto.set_value(pto_toggled);
         }
 
         //
-        //    WINGS CONTROLL
-        //      "Left" to extend or retract wings
+        //    ARM CONTROLL
+        //      "B" to drop or pickup arm
         //
-        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) {
-            wings_toggled = !wings_toggled;
-            wings.set_value(wings_toggled);
+        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)) {
+            arm_toggled = !arm_toggled;
+            arm.set_value(arm_toggled);
+        }
+
+        //
+        //    LOCK CONTROLL
+        //      "Y" to trigger hang lock ratchet
+        //
+        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
+            lock_toggled = !lock_toggled;
+            lock.set_value(lock_toggled);
+        }
+
+        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_X) && controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
+            controller.rumble("-");
+            skills();
         }
 
         // timing to fix loop issues
