@@ -16,16 +16,74 @@ pros::ADIDigitalOut arm('c');
 // Autons
 //
 void close_qual() {
+  /*
+
+    1. Roll alliance triball to goal
+    2. Grab center triball
+    3. Get corner triball out
+    4. Roll all balls under
+    5. Touch bar
   
+  */
+  intake = -127;
+  pros::delay(400);
+  chassis.set_turn_pid(80, TURN_SPEED);
+  chassis.wait_drive();
+
+  intake = 127;
+  chassis.set_drive_pid(24, 127);
+  chassis.wait_drive();
+
+  chassis.set_drive_pid(-24, 127);
+  chassis.wait_drive();
+
+  // arm down
+
+  chassis.set_turn_pid(-45, TURN_SPEED);
+  chassis.wait_drive();
+
+  // arm up
+
+  chassis.set_turn_pid(0, TURN_SPEED);
+  chassis.wait_drive();
+
+  chassis.set_drive_pid(-6, 127);
+  chassis.wait_drive();
+
+  chassis.set_turn_pid(135, TURN_SPEED);
+  chassis.wait_drive();
+
+  intake = -127;
+  pros::delay(400);
+
+  chassis.set_turn_pid(-40, TURN_SPEED);
+  chassis.wait_drive();
+
+  intake = 0;
+
+  chassis.set_drive_pid(-14, 127);
+  chassis.wait_drive();
+
+  chassis.set_turn_pid(-30, TURN_SPEED);
+  chassis.wait_drive();
+
+  // arm down
 }
 void far_qual() {
+  /*
+
+    1. Slap alliance triball
+    2. Grab top triball
+    3. Score middle 2 triballs
+    4. Grab third triball
   
+  */
 }
 void close_elim() {
   
 }
 void far_elim() {
-  
+
 }
 void skills() {
   

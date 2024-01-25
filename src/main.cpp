@@ -11,15 +11,12 @@
 #include "pros/motors.hpp"
 #include "pros/rtos.h"
 #include "pros/rtos.hpp"
-#include <cstdio>
-#include <iostream>
-#include <ostream>
 #include <string>
 
 // chassis
 // used for auton, and drive control
 Drive chassis(
-    {-1, -2, -3},
+    {-1, -5, -3},
     {11, 12, 13},
     21,
     4.125,
@@ -37,6 +34,7 @@ bool running = true;
 
 void select_auton() {
     pros::ADIDigitalIn limit('d');
+    ez::as::page_down();
     while (running) {
         if (limit.get_new_press()) {
             ez::as::page_up();
@@ -61,8 +59,8 @@ void initialize() {
 
     // Autonomous Selector using LLEMU
     ez::as::auton_selector.add_autons({
-        Auton("Close Qualifier Auton\n1. Gets triball out of the corner.\n2. Scores alliance triball.\n3. Grabs middle triball.\n4. Touches alliance pole.", close_qual),
-        Auton("Far Qualifier Auton\n1. Slaps alliance triball towards goal.\n2. Grabs furthest middle triball.\n3. Scores middle triballs.\n4. Grabs last middle triball.\n5. Scores held triball and alliance triball.\n6. Touch Bar.", far_qual),
+        Auton("Close Qualifier Auton\n1.Gets triball out of the corner.\n2.Scores alliance triball.\n3.Grabs middle triball.\n4.Touches alliance pole.", close_qual),
+        Auton("Far Qualifier Auton\n1.Slaps alliance triball towards goal.\n2.Scores middle triballs.\n3.Scores last middle triball alliance triball.\n4.Touches Bar.", far_qual),
         Auton("Close Elimination Auton\nJust trust that it will do well.", close_elim),
         Auton("Far Elimination Auton\nJust trust that it will do well.", far_elim),
         Auton("Skills Auton\nOnly for skills.", skills),
@@ -142,6 +140,11 @@ void opcontrol() {
     //    MACRO FOR DRIVER SKILLS
     //      "X" and "Up" to start Macro
     //
+    if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_X) && controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
+        controller.rumble("-");
+        controller.set_text(0,0, "Running Auton");
+        close_qual();
+    }
 
     // driver loop
     while (true) {
@@ -217,11 +220,6 @@ void opcontrol() {
         if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
             lock_toggled = !lock_toggled;
             lock.set_value(lock_toggled);
-        }
-
-        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_X) && controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
-            controller.rumble("-");
-            skills();
         }
 
         // timing to fix loop issues
