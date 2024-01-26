@@ -111,8 +111,11 @@ void opcontrol() {
 
     // controller
     pros::Controller controller(pros::E_CONTROLLER_MASTER);
-    // kicker
-    pros::Motor kicker(17);
+    
+    // hang
+    pros::Motor hang1(19);
+    pros::Motor hang2(20);
+
     // intake
     pros::Motor intake(15);
 
@@ -166,11 +169,14 @@ void opcontrol() {
         //      "R2" to raise hang
         //
         if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
-            kicker = 127;
+            hang1 = 127;
+            hang2 = 127;
         } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
-            kicker = -127;
+            hang1 = -127;
+            hang2 = -127;
         } else {
-            kicker = 0;
+            hang1 = 0;
+            hang2 = 0;
         }
 
         //
