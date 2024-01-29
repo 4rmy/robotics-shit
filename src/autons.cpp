@@ -1,4 +1,5 @@
 #include "autons.hpp"
+#include "EZ-Template/util.hpp"
 #include "pros/motors.hpp"
 
 const int DRIVE_SPEED = 110; // This is 110/127 (around 87% of max speed).  We don't suggest making this 127.
@@ -6,7 +7,8 @@ const int TURN_SPEED  = 90;
 const int SWING_SPEED = 90;
 
 // Mechs
-pros::Motor kicker(17);
+pros::Motor hang1(19);
+pros::Motor hang2(20);
 pros::Motor intake(15);
 pros::ADIDigitalOut wings('a');
 pros::ADIDigitalOut pto('b');
@@ -26,15 +28,22 @@ void close_qual() {
   
   */
   intake = -127;
+  hang1 = 127;
+  hang2 = 127;
   pros::delay(400);
   chassis.set_turn_pid(80, TURN_SPEED);
   chassis.wait_drive();
+  hang1 = -127;
+  hang2 = -127;
 
   intake = 127;
-  chassis.set_drive_pid(24, 127);
+  chassis.set_drive_pid(24.5, 127);
   chassis.wait_drive();
 
-  chassis.set_drive_pid(-24, 127);
+  hang1 = 0;
+  hang2 = 0;
+
+  chassis.set_drive_pid(-24, DRIVE_SPEED);
   chassis.wait_drive();
 
   // arm down
@@ -47,7 +56,7 @@ void close_qual() {
   chassis.set_turn_pid(0, TURN_SPEED);
   chassis.wait_drive();
 
-  chassis.set_drive_pid(-6, 127);
+  chassis.set_drive_pid(-6, DRIVE_SPEED);
   chassis.wait_drive();
 
   chassis.set_turn_pid(135, TURN_SPEED);
@@ -61,14 +70,17 @@ void close_qual() {
 
   intake = 0;
 
-  chassis.set_drive_pid(-14, 127);
+  chassis.set_drive_pid(-14.5, DRIVE_SPEED);
   chassis.wait_drive();
 
-  chassis.set_turn_pid(-30, TURN_SPEED);
+  chassis.set_drive_pid(3, DRIVE_SPEED);
+  chassis.wait_drive();
+
+  chassis.set_turn_pid(-20, TURN_SPEED);
   chassis.wait_drive();
 
   // arm down
-}
+} // TEST ME
 void far_qual() {
   /*
 
@@ -78,7 +90,45 @@ void far_qual() {
     4. Grab third triball
   
   */
-}
+
+  // wings out
+  pros::delay(200);
+  // wings in
+  
+  intake = 127;
+
+  chassis.set_drive_pid(25, DRIVE_SPEED);
+  chassis.wait_drive();
+
+  chassis.set_turn_pid(130, TURN_SPEED);
+  chassis.wait_drive();
+
+  // wings out
+  intake = -127;
+  chassis.set_drive_pid(16, DRIVE_SPEED);
+  chassis.wait_drive();
+
+  chassis.set_drive_pid(-6, DRIVE_SPEED);
+  chassis.wait_drive();
+
+  intake = 127;
+  chassis.set_turn_pid(270, TURN_SPEED);
+  chassis.wait_drive();
+
+  chassis.set_drive_pid(12, DRIVE_SPEED);
+  chassis.wait_drive();
+
+  chassis.set_turn_pid(130, TURN_SPEED);
+  chassis.wait_drive();
+
+  intake = -127;
+  chassis.set_drive_pid(12, DRIVE_SPEED);
+  chassis.wait_drive();
+
+  chassis.set_swing_pid(ez::RIGHT_SWING, -90, DRIVE_SPEED);
+  chassis.wait_drive();
+
+} // START ME
 void close_elim() {
   
 }
