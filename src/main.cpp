@@ -125,7 +125,7 @@ void opcontrol() {
     wings.set_value(wings_toggled);
 
     // pto
-    pros::ADIDigitalOut pto('b');
+    pros::ADIDigitalOut pto('e');
     bool pto_toggled = true;
     pto.set_value(pto_toggled);
 
@@ -135,7 +135,7 @@ void opcontrol() {
     arm.set_value(arm_toggled);
 
     // hang lock
-    pros::ADIDigitalOut lock('e');
+    pros::ADIDigitalOut lock('b');
     bool lock_toggled = false;
     lock.set_value(lock_toggled);
 
@@ -146,7 +146,12 @@ void opcontrol() {
     if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_X) && controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
         controller.rumble("-");
         controller.set_text(0,0, "Running Auton");
-        close_qual();
+
+        chassis.reset_pid_targets();
+        chassis.reset_gyro();
+        chassis.reset_drive_sensor();
+        chassis.set_drive_brake(MOTOR_BRAKE_HOLD); // helps autonomous consistency.
+        skills();
     }
 
     // driver loop
@@ -194,9 +199,9 @@ void opcontrol() {
 
         //
         //    WINGS CONTROLL
-        //      "A" to extend or retract wings
+        //      "Y" to extend or retract wings
         //
-        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
+        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
             wings_toggled = !wings_toggled;
             wings.set_value(wings_toggled);
         }
@@ -221,9 +226,9 @@ void opcontrol() {
 
         //
         //    LOCK CONTROLL
-        //      "Y" to trigger hang lock ratchet
+        //      "Right" to trigger hang lock ratchet
         //
-        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
+        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
             lock_toggled = !lock_toggled;
             lock.set_value(lock_toggled);
         }

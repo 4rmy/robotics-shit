@@ -2,7 +2,7 @@
 #include "EZ-Template/util.hpp"
 #include "pros/motors.hpp"
 
-const int DRIVE_SPEED = 110; // This is 110/127 (around 87% of max speed).  We don't suggest making this 127.
+const int DRIVE_SPEED = 110; // This is 110/127 (around 87% of max speed). We don't suggest making this 127.
 const int TURN_SPEED  = 90;
 const int SWING_SPEED = 90;
 
@@ -28,30 +28,32 @@ void close_qual() {
   
   */
   intake = -127;
-  hang1 = 127;
-  hang2 = 127;
-  pros::delay(400);
-  chassis.set_turn_pid(80, TURN_SPEED);
-  chassis.wait_drive();
   hang1 = -127;
   hang2 = -127;
+  pros::delay(500);
+  chassis.set_turn_pid(80, TURN_SPEED);
+  chassis.wait_drive();
 
   intake = 127;
-  chassis.set_drive_pid(24.5, 127);
+  chassis.set_drive_pid(23.9, 127);
+  chassis.wait_until(6);
+  hang1 = 0;
+  hang2 = 0;
   chassis.wait_drive();
+  pros::delay(200);
 
   hang1 = 0;
   hang2 = 0;
 
-  chassis.set_drive_pid(-24, DRIVE_SPEED);
+  chassis.set_drive_pid(-23.5, DRIVE_SPEED);
   chassis.wait_drive();
-
-  // arm down
 
   chassis.set_turn_pid(-45, TURN_SPEED);
+  pros::delay(100);
+  arm.set_value(true);
   chassis.wait_drive();
 
-  // arm up
+  arm.set_value(false);
 
   chassis.set_turn_pid(0, TURN_SPEED);
   chassis.wait_drive();
@@ -65,22 +67,14 @@ void close_qual() {
   intake = -127;
   pros::delay(400);
 
-  chassis.set_turn_pid(-40, TURN_SPEED);
+  chassis.set_turn_pid(-45, TURN_SPEED);
   chassis.wait_drive();
 
   intake = 0;
 
-  chassis.set_drive_pid(-14.5, DRIVE_SPEED);
+  chassis.set_drive_pid(-14.5, DRIVE_SPEED/2);
   chassis.wait_drive();
-
-  chassis.set_drive_pid(3, DRIVE_SPEED);
-  chassis.wait_drive();
-
-  chassis.set_turn_pid(-20, TURN_SPEED);
-  chassis.wait_drive();
-
-  // arm down
-} // TEST ME
+} // DONE ME
 void far_qual() {
   /*
 
@@ -91,9 +85,9 @@ void far_qual() {
   
   */
 
-  // wings out
-  pros::delay(200);
-  // wings in
+  wings.set_value(true);
+  pros::delay(800);
+  wings.set_value(false);
   
   intake = 127;
 
@@ -103,10 +97,11 @@ void far_qual() {
   chassis.set_turn_pid(130, TURN_SPEED);
   chassis.wait_drive();
 
-  // wings out
+  wings.set_value(true);
   intake = -127;
-  chassis.set_drive_pid(16, DRIVE_SPEED);
+  chassis.set_drive_pid(14, DRIVE_SPEED);
   chassis.wait_drive();
+  wings.set_value(false);
 
   chassis.set_drive_pid(-6, DRIVE_SPEED);
   chassis.wait_drive();
@@ -118,14 +113,17 @@ void far_qual() {
   chassis.set_drive_pid(12, DRIVE_SPEED);
   chassis.wait_drive();
 
-  chassis.set_turn_pid(130, TURN_SPEED);
+  chassis.set_turn_pid(140, TURN_SPEED);
   chassis.wait_drive();
 
-  intake = -127;
-  chassis.set_drive_pid(12, DRIVE_SPEED);
+  intake = 0;
+  chassis.set_drive_pid(14, DRIVE_SPEED);
   chassis.wait_drive();
 
-  chassis.set_swing_pid(ez::RIGHT_SWING, -90, DRIVE_SPEED);
+  chassis.set_swing_pid(ez::RIGHT_SWING, 20 , 127);
+  chassis.wait_drive();
+
+  chassis.set_drive_pid(-4, DRIVE_SPEED);
   chassis.wait_drive();
 
 } // START ME
