@@ -59,10 +59,10 @@ void initialize() {
 
     // Autonomous Selector using LLEMU
     ez::as::auton_selector.add_autons({
+        Auton("Far Elimination Auton\nJust trust that it will do well.", far_elim),
+        Auton("Close Elimination Auton\nJust trust that it will do well.", close_elim),
         Auton("Close Qualifier Auton\n1.Gets triball out of the corner.\n2.Scores alliance triball.\n3.Grabs middle triball.\n4.Touches alliance pole.", close_qual),
         Auton("Far Qualifier Auton\n1.Slaps alliance triball towards goal.\n2.Scores middle triballs.\n3.Scores last middle triball alliance triball.\n4.Touches Bar.", far_qual),
-        Auton("Close Elimination Auton\nJust trust that it will do well.", close_elim),
-        Auton("Far Elimination Auton\nJust trust that it will do well.", far_elim),
         Auton("Skills Auton\nOnly for skills.", skills),
         Auton("Backwards Auton\nOnly Moves Backwards.", back),
         Auton("No Auton\nIt literally stands still.", blank),
@@ -95,6 +95,7 @@ void autonomous() {
     chassis.set_drive_brake(MOTOR_BRAKE_HOLD); // helps autonomous consistency.
 
     ez::as::auton_selector.call_selected_auton();
+    //far_elim();
 }
 
 // bot for driver control
