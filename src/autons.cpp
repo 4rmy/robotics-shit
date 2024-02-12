@@ -178,6 +178,7 @@ void close_elim() {
   chassis.wait_drive();
 
   arm.set_value(true);
+  pros::delay(100);
 
   chassis.set_turn_pid(-90, TURN_SPEED);
   chassis.wait_drive();
@@ -197,10 +198,10 @@ void close_elim() {
 
   hang = -127;
 
-  chassis.set_drive_pid(-12.5, 127);
+  chassis.set_drive_pid(-14, 127);
   chassis.wait_drive();
 
-  pros::delay(1100);
+  pros::delay(1300);
   hang = 0;
   intake = 0;
 }
@@ -220,7 +221,7 @@ void far_elim() {
   chassis.set_drive_pid(-6, 127);
   arm.set_value(true);
   chassis.wait_drive();
-  chassis.set_turn_pid(-75, TURN_SPEED);
+  chassis.set_turn_pid(-80, TURN_SPEED);
   chassis.wait_drive();
 
   arm.set_value(false);

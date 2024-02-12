@@ -59,11 +59,11 @@ void initialize() {
 
     // Autonomous Selector using LLEMU
     ez::as::auton_selector.add_autons({
-        Auton("Far Elimination Auton\nJust trust that it will do well.", far_elim),
-        Auton("Close Elimination Auton\nJust trust that it will do well.", close_elim),
-        Auton("Close Qualifier Auton\n1.Gets triball out of the corner.\n2.Scores alliance triball.\n3.Grabs middle triball.\n4.Touches alliance pole.", close_qual),
-        Auton("Far Qualifier Auton\n1.Slaps alliance triball towards goal.\n2.Scores middle triballs.\n3.Scores last middle triball alliance triball.\n4.Touches Bar.", far_qual),
-        Auton("Skills Auton\nOnly for skills.", skills),
+        Auton("Far Qualifier Auton\n4 ball auton.\nPlace aiming to top mid triball.", far_qual),
+        Auton("Close Elimination + Qualifier Auton\nPlace aiming to top mid triball.", close_elim),
+        Auton("Far Elimination Auton\n6 ball auton.\nPlace hovering hang ball.", far_elim),
+        //Auton("Close Qualifier Auton\n1.triball out of the corner.\n2.Scores alliance triball.\n3.Grabs middle triball.\n4.Touches alliance pole.", close_qual),
+        Auton("Skills Auton\nOnly for skills.\nAim back towards goal.", skills),
         Auton("Backwards Auton\nOnly Moves Backwards.", back),
         Auton("No Auton\nIt literally stands still.", blank),
     });
