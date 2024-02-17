@@ -16,24 +16,24 @@
 // chassis
 // used for auton, and drive control
 Drive chassis(
-    {-1, -5, -3},
-    {11, 12, 13},
+    {1, 3, 5},
+    {-11, -12, -13},
     21,
-    4.125,
-    200,
+    2.75,
+    600,
 
     // External Gear Ratio (MUST BE DECIMAL)
     //    (or gear ratio of tracking wheel)
     // eg. if your drive is 84:36 where the 36t is powered, your RATIO
     // would be 2.333. eg. if your drive is 36:60 where the 60t is
     // powered, your RATIO would be 0.6.
-    64 / (float)36
+    1
 );
 
 bool running = true;
 
 void select_auton() {
-    pros::ADIDigitalIn limit('d');
+    pros::ADIDigitalIn limit('c');
     ez::as::page_down();
     while (running) {
         if (limit.get_new_press()) {
@@ -121,24 +121,11 @@ void opcontrol() {
     pros::Motor intake(15);
 
     // wings
-    pros::ADIDigitalOut wings('a');
+    pros::ADIDigitalOut wingsleft('b');
+    pros::ADIDigitalOut wingsright('a');
     bool wings_toggled = false;
-    wings.set_value(wings_toggled);
-
-    // pto
-    pros::ADIDigitalOut pto('e');
-    bool pto_toggled = true;
-    pto.set_value(pto_toggled);
-
-    // arm
-    pros::ADIDigitalOut arm('c');
-    bool arm_toggled = false;
-    arm.set_value(arm_toggled);
-
-    // hang lock
-    pros::ADIDigitalOut lock('b');
-    bool lock_toggled = false;
-    lock.set_value(lock_toggled);
+    wingsleft.set_value(wings_toggled);
+    wingsright.set_value(wings_toggled);
 
     //
     //    MACRO FOR DRIVER SKILLS
@@ -204,34 +191,8 @@ void opcontrol() {
         //
         if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
             wings_toggled = !wings_toggled;
-            wings.set_value(wings_toggled);
-        }
-
-        //
-        //    PTO CONTROLL
-        //      "Left" to switch pto from kicker to hang and vice versa
-        //
-        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) {
-            pto_toggled = !pto_toggled;
-            pto.set_value(pto_toggled);
-        }
-
-        //
-        //    ARM CONTROLL
-        //      "B" to drop or pickup arm
-        //
-        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)) {
-            arm_toggled = !arm_toggled;
-            arm.set_value(arm_toggled);
-        }
-
-        //
-        //    LOCK CONTROLL
-        //      "Right" to trigger hang lock ratchet
-        //
-        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
-            lock_toggled = !lock_toggled;
-            lock.set_value(lock_toggled);
+            wingsleft.set_value(wings_toggled);
+            wingsright.set_value(wings_toggled);
         }
 
         // timing to fix loop issues
